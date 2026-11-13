@@ -1,0 +1,48 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'dev.remixwidget'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'dev.remixwidget'
+        minSdk 26
+        targetSdk 34
+        versionCode 1
+        versionName '1.0'
+        // 목록 파일(list.json)이 올라가 있는 주소. GitHub 저장소를 만든 뒤 OWNER/REPO 를 바꿉니다.
+        buildConfigField 'String', 'LIST_URL', '"https://raw.githubusercontent.com/pozia-cyber/Streaming-widget/main/list.json"'
+        // 새 버전 앱(APK)을 받는 주소.
+        buildConfigField 'String', 'APK_URL', '"https://github.com/pozia-cyber/Streaming-widget/releases/latest/download/RemixWidget.apk"'
+    }
+
+    // 업데이트 설치가 되려면 매번 같은 서명이어야 해서 고정 키를 함께 둡니다. (개인용 앱 기준)
+    signingConfigs {
+        shared {
+            storeFile file('shared.keystore')
+            storePassword 'remixwidget'
+            keyAlias 'remix'
+            keyPassword 'remixwidget'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.shared
+        }
+        debug {
+            signingConfig signingConfigs.shared
+        }
+    }
+    buildFeatures { buildConfig true }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+}
