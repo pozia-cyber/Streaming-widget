@@ -35,14 +35,16 @@
         android:maxLines="2"
         android:text="Star Trace"
         android:textColor="#0D1A26"
-        android:textSize="18sp" />
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/w_sub"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:maxLines="1"
+        android:ellipsize="marquee"
+        android:singleLine="true"
+        android:fadingEdgeLength="22dp"
+        android:requiresFadingEdge="horizontal"
         android:textColor="#566B7F"
         android:textSize="11sp" />
 
@@ -76,6 +78,7 @@
             android:paddingBottom="8dp">
 
             <TextView
+                android:id="@+id/w_lbl"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="종료까지"
@@ -94,6 +97,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/w_div"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="2dp"
@@ -105,8 +109,10 @@
         android:id="@+id/w_next"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:maxLines="1"
+        android:ellipsize="marquee"
+        android:singleLine="true"
+        android:fadingEdgeLength="22dp"
+        android:requiresFadingEdge="horizontal"
         android:text="NEXT  Rewind"
         android:textColor="#566B7F"
         android:textSize="12sp" />

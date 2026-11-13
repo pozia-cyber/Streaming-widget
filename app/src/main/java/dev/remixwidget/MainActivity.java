@@ -59,6 +59,14 @@ public class MainActivity extends Activity {
         status.setPadding(0, 0, 0, dp(8));
         root.addView(status);
 
+        root.addView(button("곡 목록 직접 편집", new View.OnClickListener() {
+            @Override public void onClick(View v) { startActivity(new Intent(MainActivity.this, ListEditActivity.class)); }
+        }));
+
+        root.addView(button("위젯 모양 설정 (색·글자 크기)", new View.OnClickListener() {
+            @Override public void onClick(View v) { startActivity(new Intent(MainActivity.this, SettingsActivity.class)); }
+        }));
+
         refreshBtn = button("목록 새로고침", new View.OnClickListener() {
             @Override public void onClick(View v) { refresh(true); }
         });
@@ -88,7 +96,7 @@ public class MainActivity extends Activity {
         root.addView(alarmBtn);
 
         TextView listTitle = new TextView(this);
-        listTitle.setText("현재 목록");
+        listTitle.setText("현재 목록 (위젯이 쓰는 목록)");
         listTitle.setTextSize(13);
         listTitle.setTextColor(Color.parseColor("#566B7F"));
         listTitle.setPadding(0, dp(12), 0, dp(4));
@@ -151,8 +159,13 @@ public class MainActivity extends Activity {
         String when = last == 0 ? "받은 적 없음(앱에 들어 있는 기본 목록)"
                 : new SimpleDateFormat("M월 d일 HH:mm", Locale.KOREA).format(new Date(last));
         String ver = ListStore.lastVersion(this);
-        status.setText(s.name + " · " + s.titles.length + "곡 · 총 " + (total / 60) + "분 " + (total % 60) + "초"
-                + "\n마지막 새로고침: " + when + (ver.isEmpty() ? "" : " (목록 버전 " + ver + ")"));
+        if (ListStore.isCustom(this)) {
+            status.setText("내 목록(직접 편집) · " + s.titles.length + "곡 · 총 " + (total / 60) + "분 " + (total % 60) + "초"
+                    + "\n내 목록을 쓰는 중이라 '목록 새로고침'을 해도 바뀌지 않아요. 공유 목록으로 돌아가려면 '곡 목록 직접 편집'에서 되돌리기를 누르세요.");
+        } else {
+            status.setText(s.name + " · " + s.titles.length + "곡 · 총 " + (total / 60) + "분 " + (total % 60) + "초"
+                    + "\n마지막 새로고침: " + when + (ver.isEmpty() ? "" : " (목록 버전 " + ver + ")"));
+        }
     }
 
     private Button button(String text, View.OnClickListener l) {

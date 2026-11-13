@@ -22,12 +22,20 @@ import java.nio.charset.StandardCharsets;
  */
 public final class ListStore {
     private static final String FILE = "list.json";
+    private static final String CUSTOM = "custom.json";
     private static final String PREFS = "list_prefs";
     private static final int MAX_BYTES = 256 * 1024;
 
     private ListStore() {}
 
     public static Schedule load(Context c) {
+        if (isCustom(c)) {
+            try {
+                return parse(readAll(new java.io.FileInputStream(new File(c.getFilesDir(), CUSTOM))));
+            } catch (Exception ignored) {
+                // 내 목록 파일이 깨졌으면 공유 목록을 씁니다.
+            }
+        }
         try {
             File f = new File(c.getFilesDir(), FILE);
             if (f.exists()) return parse(readAll(new java.io.FileInputStream(f)));
@@ -39,6 +47,54 @@ public final class ListStore {
         } catch (Exception e) {
             throw new IllegalStateException("기본 목록을 읽을 수 없습니다", e);
         }
+    }
+
+    /** "내 목록(직접 편집)"을 쓰는 중인지 */
+    public static boolean isCustom(Context c) {
+        return Prefs.useCustom(c) && new File(c.getFilesDir(), CUSTOM).exists();
+    }
+
+    /** 직접 편집한 목록을 저장하고, 그 목록을 쓰도록 바꿉니다. 실패하면 이유를, 성공하면 null. */
+    public static String saveCustom(Context c, Schedule s) {
+        try {
+            File tmp = new File(c.getFilesDir(), CUSTOM + ".tmp");
+            try (FileOutputStream out = new FileOutputStream(tmp)) {
+                out.write(toJson(s).getBytes(StandardCharsets.UTF_8));
+            }
+            File dst = new File(c.getFilesDir(), CUSTOM);
+            if (!tmp.renameTo(dst)) {
+                dst.delete();
+                if (!tmp.renameTo(dst)) return "목록을 저장하지 못했습니다";
+            }
+            Prefs.setUseCustom(c, true);
+            return null;
+        } catch (Exception e) {
+            return "목록을 저장하지 못했습니다";
+        }
+    }
+
+    /** 내 목록을 지우고 공유 목록(list.json)으로 되돌립니다. */
+    public static void clearCustom(Context c) {
+        Prefs.setUseCustom(c, false);
+        new File(c.getFilesDir(), CUSTOM).delete();
+    }
+
+    /** 저장소의 list.json 에 그대로 붙여 넣을 수 있는 형식 */
+    public static String toJson(Schedule s) throws JSONException {
+        JSONObject o = new JSONObject();
+        o.put("name", s.name);
+        o.put("version", new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(new java.util.Date()));
+        o.put("cycleSeconds", s.cycle);
+        JSONArray a = new JSONArray();
+        for (int i = 0; i < s.titles.length; i++) {
+            JSONObject t = new JSONObject();
+            t.put("title", s.titles[i]);
+            t.put("sub", s.subs[i]);
+            t.put("length", ListText.formatSeconds(s.seconds[i]));
+            a.put(t);
+        }
+        o.put("tracks", a);
+        return o.toString(2);
     }
 
     /** list.json 내용을 검사하고 Schedule 로 바꿉니다. 형식이 틀리면 예외(메시지에 이유). */
