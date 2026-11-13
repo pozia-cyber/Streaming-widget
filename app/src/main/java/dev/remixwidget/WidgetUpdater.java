@@ -42,6 +42,7 @@ public final class WidgetUpdater {
         if (mini.length > 0) {
             RemoteViews rv = new RemoteViews(c.getPackageName(), R.layout.widget_mini);
             fillHeader(c, rv, s, st);
+            rv.setTextViewText(R.id.w_idx, st.gap ? "WAIT" : String.format("%d/%d", st.index + 1, s.count));
             mgr.updateAppWidget(mini, rv);
         }
         if (big.length > 0) {
@@ -67,6 +68,8 @@ public final class WidgetUpdater {
             rv.setTextViewText(R.id.w_title, s.titles[st.index]);
             rv.setTextViewText(R.id.w_sub, s.subs[st.index]);
         }
+        boolean hasSub = !st.gap && !s.subs[st.index].isEmpty();
+        rv.setViewVisibility(R.id.w_sub, hasSub ? android.view.View.VISIBLE : android.view.View.GONE);
         // 위로 올라가는 타이머(현재 재생 위치). 시스템이 직접 세므로 위젯을 갱신하지 않아도 초가 올라갑니다.
         rv.setChronometer(R.id.w_pos, elapsed - st.withinMs, null, !st.gap);
         // 아래로 내려가는 타이머(곡 종료까지)
@@ -96,7 +99,7 @@ public final class WidgetUpdater {
             boolean cur = !st.gap && i == st.index;
             boolean past = !st.gap ? i < st.index : true;
             rv.setTextColor(id, cur ? Color.WHITE : (past ? COLOR_MUTE : COLOR_INK));
-            rv.setInt(id, "setBackgroundColor", cur ? COLOR_ACCENT : Color.TRANSPARENT);
+            rv.setInt(id, "setBackgroundResource", cur ? R.drawable.row_cur : R.drawable.row_none);
         }
     }
 
