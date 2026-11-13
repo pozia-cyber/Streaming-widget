@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/w_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg"
+    android:gravity="center_vertical"
+    android:paddingLeft="14dp"
+    android:paddingTop="4dp"
+    android:paddingRight="14dp"
+    android:paddingBottom="4dp"
+    android:orientation="horizontal">
+    <Chronometer
+        android:id="@+id/w_pos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
+        android:text="00:00"
+        android:textColor="#0D1A26"
+        android:textSize="32sp" />
+    <TextView
+        android:id="@+id/w_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="8dp"
+        android:ellipsize="marquee"
+        android:fadingEdgeLength="22dp"
+        android:singleLine="true"
+        android:requiresFadingEdge="horizontal"
+        android:fontFamily="sans-serif-medium"
+        android:text="Star Trace"
+        android:textColor="#0D1A26"
+        android:textSize="20sp" />
+    <Chronometer
+        android:id="@+id/w_remain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
+        android:text="02:59"
+        android:textColor="#0670A8"
+        android:textSize="16sp" />
+    <TextView
+        android:id="@+id/w_idx"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="7dp"
+        android:paddingTop="2dp"
+        android:paddingRight="7dp"
+        android:paddingBottom="2dp"
+        android:layout_marginLeft="10dp"
+        android:background="@drawable/chip_bg"
+        android:text="19/20"
+        android:textColor="#0670A8"
+        android:textSize="11sp"
+        android:textStyle="bold" />
+    <TextView
+        android:id="@+id/w_sub"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone" />
+    <TextView
+        android:id="@+id/w_next"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone" />
+</LinearLayout>

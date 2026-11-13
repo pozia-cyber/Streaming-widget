@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">REMIX 스밍</string>
     <string name="widget_mini_label">REMIX 스밍 (가로 2칸)</string>
+    <string name="widget_wide_label">REMIX 스밍 (가로 4칸)</string>
     <string name="widget_small_label">REMIX 스밍 (작게)</string>
     <string name="widget_big_label">REMIX 스밍 (목록 포함)</string>
 </resources>

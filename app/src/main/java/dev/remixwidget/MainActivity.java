@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.PowerManager;
 import android.provider.Settings;
 import android.view.Gravity;
 import android.view.View;
@@ -27,6 +28,8 @@ public class MainActivity extends Activity {
     private TextView listView;
     private Button refreshBtn;
     private Button alarmBtn;
+    private Button batteryBtn;
+    private TextView hint;
     private final Handler ui = new Handler(Looper.getMainLooper());
 
     @Override
@@ -95,6 +98,27 @@ public class MainActivity extends Activity {
         });
         root.addView(alarmBtn);
 
+        batteryBtn = button("배터리 사용 제한 해제 (곡이 안 넘어갈 때)", new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                try {
+                    startActivity(new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:" + getPackageName())));
+                } catch (Exception e) {
+                    try {
+                        startActivity(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS));
+                    } catch (Exception e2) {
+                        startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getPackageName())));
+                    }
+                }
+            }
+        });
+        root.addView(batteryBtn);
+
+        hint = new TextView(this);
+        hint.setTextSize(12);
+        hint.setTextColor(Color.parseColor("#566B7F"));
+        hint.setPadding(0, dp(6), 0, 0);
+        root.addView(hint);
+
         TextView listTitle = new TextView(this);
         listTitle.setText("현재 목록 (위젯이 쓰는 목록)");
         listTitle.setTextSize(13);
@@ -117,11 +141,26 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         showList();
-        alarmBtn.setVisibility(WidgetUpdater.canScheduleExact(this) ? View.GONE : View.VISIBLE);
+        boolean exact = WidgetUpdater.canScheduleExact(this);
+        boolean batteryOk = isIgnoringBatteryOptimizations();
+        alarmBtn.setVisibility(exact ? View.GONE : View.VISIBLE);
+        batteryBtn.setVisibility(batteryOk ? View.GONE : View.VISIBLE);
+        if (exact && batteryOk) {
+            hint.setVisibility(View.GONE);
+        } else {
+            hint.setVisibility(View.VISIBLE);
+            hint.setText("곡이 바뀌는데 위젯이 늦게 따라오면 위 버튼으로 허용해 주세요."
+                    + "\n삼성 폰: 설정 → 배터리 → 백그라운드 사용 제한 에서 '사용하지 않는 앱을 절전 상태로 전환'을 끄고, REMIX 스밍을 '절전 모드 안 함' 목록에 넣어 주세요.");
+        }
         long last = ListStore.lastRefreshMs(this);
         // 열 때마다, 마지막 새로고침이 1시간 이상 지났으면 조용히 새로 받아 봅니다
         if (System.currentTimeMillis() - last > 3600_000L) refresh(false);
         WidgetUpdater.updateAll(this);
+    }
+
+    private boolean isIgnoringBatteryOptimizations() {
+        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+        return pm == null || pm.isIgnoringBatteryOptimizations(getPackageName());
     }
 
     private void refresh(final boolean verbose) {
